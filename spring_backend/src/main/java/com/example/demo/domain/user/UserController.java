@@ -64,7 +64,7 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasAuthority('USER_DELETE')")
+  @PreAuthorize("hasAuthority('USER_DEACTIVATE')")
   public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
     userService.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
