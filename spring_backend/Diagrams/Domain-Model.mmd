@@ -1,0 +1,25 @@
+classDiagram
+    User <|-- ListEntry : created by
+    User --|> Authority : has Authority
+    Roles --|> Authority : has role
+
+    class User{
+        +email
+        +firstName
+        +lastName
+        +password
+    }
+
+    class ListEntry{
+      +title
+      +text
+      +importance
+    }
+
+    class Roles{
+      +name
+    }
+
+    class Authority {
+      +name
+    }
