@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor user
+actor admin
+actor "<<service>> Authentication"
+rectangle "Custom List" {
+  (register user) .> (login) : include
+  user .> (login) : "when admin/already registered"
+  (login) .> (add Listeneinträge) : include
+  (get Listeneinträge) -- admin
+  (delete Listeneinträge) -- admin : extends
+  (login) .> (update Listeneinträge) : include
+  (login) .> (delete Listeneinträge) : include
+  (login) .> (get Listeneinträge) : include
+  user -- (register user)
+  (register user) -- admin : extends
+  (login) -- "<<service>> Authentication"
+  (get Listeneinträge) -- "<<service>> Authentication"
+  (update Listeneinträge) -- "<<service>> Authentication"
+  (delete Listeneinträge) -- "<<service>> Authentication"
+  (add Listeneinträge) -- "<<service>> Authentication"
+}
+@enduml
