@@ -1,13 +1,9 @@
 package com.example.demo.domain.customlist;
 
-import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import com.example.demo.core.generic.AbstractServiceImpl;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -15,12 +11,12 @@ import java.util.*;
 public class ListEntryService extends AbstractServiceImpl<ListEntry> {
 
     private final  UserService userService;
-
     private final ListEntryRepository repository;
 
-    public ListEntryService(UserService userService, ListEntryRepository Repository) {
+    public ListEntryService(UserService userService, ListEntryRepository repository) {
+        super(repository);
+        this.repository = repository;
         this.userService = userService;
-        this.repository = Repository;
     }
 
     public List<ListEntry> getAllEntries() {
