@@ -1,6 +1,8 @@
 package com.example.demo.domain.customlist;
 
 
+import com.example.demo.domain.customlist.dto.ListEntryDTO;
+import com.example.demo.domain.customlist.dto.ListEntryMapper;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Validated
@@ -24,43 +25,47 @@ import java.util.UUID;
 public class ListEntryController {
 
     private final ListEntryService entryService;
+    private final ListEntryMapper entryMapper;
 
     @Autowired
-    public ListEntryController(ListEntryService entryService) {
+    public ListEntryController(ListEntryService entryService, ListEntryMapper entryMapper) {
         this.entryService = entryService;
+        this.entryMapper = entryMapper;
     }
 
     private String getMailFromJWT(){return SecurityContextHolder.getContext().getAuthentication().getName(); }
 
     @GetMapping
     @PreAuthorize("hasAuthority('USER_READ')")
-    public ResponseEntity<List<ListEntry>> getAllEntries() {
-        return ResponseEntity.ok(entryService.getAllEntries());
+    public ResponseEntity<List<ListEntryDTO>> getAllEntries() {
+        return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_READ') || @userPermissionEvaluator.isOwnEntryOrIsAdminEvaluator(authentication.principal.user,#id)")
-    public ResponseEntity<ListEntry> getEntryById(@PathVariable UUID id) {
+    public ResponseEntity<ListEntryDTO> getEntryById(@PathVariable UUID id) {
         try {
             ListEntry entry = entryService.getEntryById(id);
-            return ResponseEntity.ok(entry);
+            return new ResponseEntity<>(entryMapper.toDTO(entry), HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<ListEntry>> getEntriesByUser() {
-        List<ListEntry> entries = entryService.getEntriesByUser(getMailFromJWT());
-        return ResponseEntity.ok(entries);
+    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser() {
+        List<ListEntry> entries = entryService.getEntriesByUser(id);
+        return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_MODIFY') || @userPermissionEvaluator.isOwnEntryOrIsAdminEvaluator(authentication.principal.user,#id)")
-    public ResponseEntity<ListEntry> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntry entry) {
+    public ResponseEntity<ListEntryDTO> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntryDTO entryDTO) {
         try {
-            entry.setId(id);
-            return ResponseEntity.ok(entryService.updateEntry(entry));
+            ListEntry entryToUpdate = entryMapper.fromDTO(entryDTO);
+            entryToUpdate.setId(id);
+            ListEntry updated = entryService.updateEntry(entryToUpdate);
+            return ResponseEntity.ok(entryMapper.toDTO(updated));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -70,9 +75,9 @@ public class ListEntryController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('USER_CREATE')")
-    public ResponseEntity<ListEntry> createEntry(@RequestBody @Valid ListEntry entry) {
-        ListEntry savedEntry = entryService.saveEntry(entry);
-        return new ResponseEntity<>(savedEntry, HttpStatus.CREATED);
+    public ResponseEntity<ListEntryDTO> createEntry(@RequestBody @Valid ListEntryDTO entryDTO) {
+        ListEntry saved = entryService.saveEntry(entryMapper.fromDTO(entryDTO));
+        return new ResponseEntity<>(entryMapper.toDTO(saved), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

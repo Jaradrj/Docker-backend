@@ -5,11 +5,14 @@ import com.example.demo.domain.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import com.example.demo.core.generic.AbstractServiceImpl;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class ListEntryService {
+public class ListEntryService extends AbstractServiceImpl<ListEntry> {
 
     private final  UserService userService;
 
@@ -47,11 +50,11 @@ public class ListEntryService {
 
     @Transactional
     public void deleteEntryById(UUID id) {
-        repository.deleteById(id);
+        deleteById(id);
     }
 
     @Transactional
     public ListEntry saveEntry(ListEntry listEntry) {
-        return repository.save(listEntry);
+        return save(listEntry);
     }
 }
