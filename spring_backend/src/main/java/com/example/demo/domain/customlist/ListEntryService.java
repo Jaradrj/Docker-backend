@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,6 +18,10 @@ public class ListEntryService {
 
     public List<ListEntry> getAllEntries() {
         return repository.findAll();
+    }
+
+    public Optional<ListEntry> getEntryById(UUID id) {
+        return repository.findById(id);
     }
 
     public List<ListEntry> getEntriesByUser(UUID userId) {

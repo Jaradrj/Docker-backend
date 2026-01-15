@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Validated
@@ -20,13 +21,19 @@ public class ListEntryController {
 
     @Autowired
     public ListEntryController(ListEntryService entryService) {
-        this.entryService = entryService;;
+        this.entryService = entryService;
     }
 
     @GetMapping
     public ResponseEntity<List<ListEntry>> getAllEntries() {
         List<ListEntry> entries = entryService.getAllEntries();
         return ResponseEntity.ok(entries);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<ListEntry>> getEntryById(@PathVariable UUID id) {
+        Optional<ListEntry> entry = entryService.getEntryById(id);
+        return ResponseEntity.ok(entry);
     }
 
     @GetMapping("/user/{id}")
