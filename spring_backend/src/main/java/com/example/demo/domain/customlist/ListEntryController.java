@@ -83,6 +83,6 @@ public class ListEntryController {
     @PreAuthorize("hasAuthority('USER_DEACTIVATE')")
     public ResponseEntity<ListEntry> deleteEntry(@PathVariable UUID id) {
         entryService.deleteEntryById(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

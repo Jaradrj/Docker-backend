@@ -50,7 +50,7 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
 
     @Transactional
     public void deleteEntryById(UUID id) {
-        deleteById(id);
+        repository.deleteById(id);
     }
 
     @Transactional
