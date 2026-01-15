@@ -1,6 +1,8 @@
 package com.example.demo.domain.customlist;
 
 
+import com.example.demo.domain.customlist.dto.ListEntryDTO;
+import com.example.demo.domain.customlist.dto.ListEntryMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,52 +19,56 @@ import java.util.UUID;
 public class ListEntryController {
 
     private final ListEntryService entryService;
+    private final ListEntryMapper entryMapper;
 
     @Autowired
-    public ListEntryController(ListEntryService entryService) {
+    public ListEntryController(ListEntryService entryService, ListEntryMapper entryMapper) {
         this.entryService = entryService;
+        this.entryMapper = entryMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<ListEntry>> getAllEntries() {
-        List<ListEntry> entries = entryService.getAllEntries();
-        return ResponseEntity.ok(entries);
+    public ResponseEntity<List<ListEntryDTO>> getAllEntries() {
+        List<ListEntry> entries = entryService.findAll();
+        return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ListEntry> getEntryById(@PathVariable UUID id) {
+    public ResponseEntity<ListEntryDTO> getEntryById(@PathVariable UUID id) {
         try {
-            return ResponseEntity.ok(entryService.getEntryById(id));
+            ListEntry entry = entryService.findById(id);
+            return new ResponseEntity<>(entryMapper.toDTO(entry), HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<ListEntry>> getEntriesByUser(@PathVariable UUID id) {
+    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser(@PathVariable UUID id) {
         List<ListEntry> entries = entryService.getEntriesByUser(id);
-        return ResponseEntity.ok(entries);
+        return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ListEntry> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntry entry) {
+    public ResponseEntity<ListEntryDTO> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntryDTO entryDTO) {
         try {
-            entry.setId(id);
-            entryService.updateEntry(entry);
-            return ResponseEntity.ok(entry);
+            ListEntry entryToUpdate = entryMapper.fromDTO(entryDTO);
+            entryToUpdate.setId(id);
+            ListEntry updated = entryService.updateEntry(entryToUpdate);
+            return ResponseEntity.ok(entryMapper.toDTO(updated));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping
-    public ResponseEntity<ListEntry> createEntry(@RequestBody @Valid ListEntry entry) {
-        ListEntry savedEntry = entryService.saveEntry(entry);
-        return new ResponseEntity<>(savedEntry, HttpStatus.CREATED);
+    public ResponseEntity<ListEntryDTO> createEntry(@RequestBody @Valid ListEntryDTO entryDTO) {
+        ListEntry saved = entryService.saveEntry(entryMapper.fromDTO(entryDTO));
+        return new ResponseEntity<>(entryMapper.toDTO(saved), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ListEntry> deleteEntry(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteEntry(@PathVariable UUID id) {
         entryService.deleteEntryById(id);
         return ResponseEntity.noContent().build();
     }

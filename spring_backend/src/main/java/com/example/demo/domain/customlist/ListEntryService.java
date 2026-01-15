@@ -18,20 +18,12 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         super.repository = Repository;
     }
 
-    public List<ListEntry> getAllEntries() {
-        return findAll();
-    }
-
-    public ListEntry getEntryById(UUID id) {
-        return findById(id);
-    }
-
     public List<ListEntry> getEntriesByUser(UUID userId) {
         return repository.findAllByUserId(userId);
     }
 
     @Transactional
-    public void updateEntry(ListEntry oldEntry) {
+    public ListEntry updateEntry(ListEntry oldEntry) {
         ListEntry updatedEntry = repository
                 .findById(oldEntry.getId())
                 .orElseThrow(() -> new NoSuchElementException("Entry not found"));
@@ -39,6 +31,7 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         updatedEntry.setText(oldEntry.getText());
         updatedEntry.setImportance(oldEntry.getImportance());
         repository.save(updatedEntry);
+        return updatedEntry;
     }
 
     @Transactional
