@@ -34,7 +34,7 @@ public class ListEntryController {
     private String getMailFromJWT(){return SecurityContextHolder.getContext().getAuthentication().getName(); }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('USER_READ_ALL')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<List<ListEntryDTO>> getAllEntries() {
         List<ListEntry> entries = entryService.getAllEntries();
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
@@ -58,7 +58,7 @@ public class ListEntryController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_READ') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
+    @PreAuthorize("hasRole('ADMIN') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntryDTO> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntryDTO entryDTO) {
         try {
             ListEntry entryToUpdate = entryMapper.fromDTO(entryDTO);
