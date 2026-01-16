@@ -34,7 +34,7 @@ public class ListEntry extends AbstractEntity {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt; // for sorting
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
