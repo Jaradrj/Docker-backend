@@ -4,12 +4,14 @@ import com.example.demo.domain.customlist.ListEntry;
 import com.example.demo.domain.customlist.ListEntryService;
 import com.example.demo.domain.role.Role;
 import com.example.demo.domain.user.User;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Component
+@Log4j2
 
 public class UserPermissionEvaluator {
     private final ListEntryService listEntryService;
@@ -32,7 +34,7 @@ public class UserPermissionEvaluator {
   }
 
   public boolean isThemselfEvaluator (User principal, UUID id) {
-        return principal.getId() == id;
+      return Objects.equals(principal.getId() ,id);
   }
 
 }
