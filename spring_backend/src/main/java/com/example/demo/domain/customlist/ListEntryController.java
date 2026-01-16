@@ -58,7 +58,7 @@ public class ListEntryController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
+    @PreAuthorize("hasAuthority('USER_MODIFY') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntryDTO> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntryDTO entryDTO) {
         try {
             ListEntry entryToUpdate = entryMapper.fromDTO(entryDTO);
