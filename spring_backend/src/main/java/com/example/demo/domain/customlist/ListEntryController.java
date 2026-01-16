@@ -58,7 +58,7 @@ public class ListEntryController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_MODIFY') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
+    @PreAuthorize("@userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntryDTO> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntryDTO entryDTO) {
         try {
             ListEntry entryToUpdate = entryMapper.fromDTO(entryDTO);
@@ -80,7 +80,7 @@ public class ListEntryController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_DEACTIVATE')")
+    @PreAuthorize("hasAuthority('USER_DEACTIVATE') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntry> deleteEntry(@PathVariable UUID id) {
         entryService.deleteEntryById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
