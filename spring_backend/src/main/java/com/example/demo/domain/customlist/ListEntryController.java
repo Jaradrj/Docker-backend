@@ -4,7 +4,6 @@ package com.example.demo.domain.customlist;
 import com.example.demo.domain.customlist.dto.ListEntryDTO;
 import com.example.demo.domain.customlist.dto.ListEntryMapper;
 import jakarta.validation.Valid;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,11 +37,12 @@ public class ListEntryController {
     @GetMapping
     @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<List<ListEntryDTO>> getAllEntries() {
+        List<ListEntry> entries = entryService.getAllEntries();
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_READ') || @userPermissionEvaluator.isOwnEntryOrIsAdminEvaluator(authentication.principal.user,#id)")
+    @PreAuthorize("hasAuthority('USER_READ') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntryDTO> getEntryById(@PathVariable UUID id) {
         try {
             ListEntry entry = entryService.getEntryById(id);
@@ -54,12 +54,12 @@ public class ListEntryController {
 
     @GetMapping("/user")
     public ResponseEntity<List<ListEntryDTO>> getEntriesByUser() {
-        List<ListEntry> entries = entryService.getEntriesByUser(id);
+        List<ListEntry> entries = entryService.getEntriesByUser(getMailFromJWT());
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_MODIFY') || @userPermissionEvaluator.isOwnEntryOrIsAdminEvaluator(authentication.principal.user,#id)")
+    @PreAuthorize("hasAuthority('USER_READ') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntryDTO> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntryDTO entryDTO) {
         try {
             ListEntry entryToUpdate = entryMapper.fromDTO(entryDTO);
@@ -84,6 +84,6 @@ public class ListEntryController {
     @PreAuthorize("hasAuthority('USER_DEACTIVATE')")
     public ResponseEntity<ListEntry> deleteEntry(@PathVariable UUID id) {
         entryService.deleteEntryById(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
