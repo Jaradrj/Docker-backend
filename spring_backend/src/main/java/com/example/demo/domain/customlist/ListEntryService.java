@@ -3,6 +3,7 @@ package com.example.demo.domain.customlist;
 import com.example.demo.core.exception.NoSuchListEntryException;
 import com.example.demo.domain.user.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import com.example.demo.core.generic.AbstractServiceImpl;
 
@@ -20,17 +21,17 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         this.userService = userService;
     }
 
-    public List<ListEntry> getAllEntries() {
-        return repository.findAll();
+    public List<ListEntry> getAllEntries(Optional<Integer> page) {
+        return repository.findAll(PageRequest.of(page.orElse(0), 10)).getContent();
     }
 
     public ListEntry getEntryById(UUID id) throws NoSuchListEntryException {
         return repository.findById(id).orElseThrow(() -> new NoSuchListEntryException(id));
     }
 
-    public List<ListEntry> getEntriesByUser(String email) {
+    public List<ListEntry> getEntriesByUser(String email, Optional<Integer> page) {
         UUID userId = userService.getUserByMail(email).getId();
-        return repository.findAllByUserId(userId);
+        return repository.findAllByUserId(userId, PageRequest.of(page.orElse(0), 10));
     }
 
     @Transactional

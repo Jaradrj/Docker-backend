@@ -12,7 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Validated
@@ -34,8 +36,13 @@ public class ListEntryController {
     @GetMapping
     @Operation(summary = "Show all entries", description = "Show all entries with their owner")
     @PreAuthorize("hasAuthority('USER_READ')")
-    public ResponseEntity<List<ListEntryDTO>> getAllEntries() {
-        List<ListEntry> entries = entryService.getAllEntries();
+    public ResponseEntity<List<ListEntryDTO>> getAllEntries(@RequestParam(value = "page", required = false) Integer page) {
+        List<ListEntry> entries;
+        if (page == null) {
+            entries = entryService.getAllEntries(Optional.empty());
+        } else {
+            entries = entryService.getAllEntries(Optional.of(page));
+        }
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
@@ -49,8 +56,14 @@ public class ListEntryController {
 
     @GetMapping("/user")
     @Operation(summary = "Show all entries of one user")
-    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser() {
-        List<ListEntry> entries = entryService.getEntriesByUser(getMailFromJWT());
+    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser(@RequestParam(value = "page", required = false) Integer page) {
+        List<ListEntry> entries;
+        if (page == null) {
+            entries = entryService.getEntriesByUser(getMailFromJWT(), Optional.empty());
+        } else {
+            entries = entryService.getEntriesByUser(getMailFromJWT(), Optional.of(page));
+        }
+
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
