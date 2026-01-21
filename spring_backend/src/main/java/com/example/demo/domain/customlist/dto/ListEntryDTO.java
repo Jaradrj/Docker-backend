@@ -10,9 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @NoArgsConstructor
 @Setter
@@ -30,13 +28,4 @@ public class ListEntryDTO extends AbstractDTO {
     @NotNull
     private UserDTO user;
     private LocalDateTime createdAt;
-
-    public ListEntryDTO(UUID id, String title, String text, ListEntry.Importance importance, UserDTO user, LocalDateTime createdAt) {
-        super(id);
-        this.title = title;
-        this.text = text;
-        this.importance = importance;
-        this.user = user;
-        this.createdAt = createdAt;
-    }
 }

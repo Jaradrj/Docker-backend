@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "list_entry")
@@ -39,14 +38,6 @@ public class ListEntry extends AbstractEntity {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
-
-    public ListEntry(UUID id, String title, String text, Importance importance, User user) {
-        super(id);
-        this.title = title;
-        this.text = text;
-        this.importance = importance;
-        this.user = user;
-    }
 
     @PrePersist
     void onCreate() {
