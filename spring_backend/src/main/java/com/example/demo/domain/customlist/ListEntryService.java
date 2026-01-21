@@ -29,6 +29,14 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         return repository.findById(id).orElseThrow(() -> new NoSuchListEntryException(id));
     }
 
+    public Integer getPages() {
+        return Math.toIntExact(repository.getListEntryCount() / 10 + 1);
+    }
+
+    public Integer getPagesForUser(String email) {
+        return Math.toIntExact(repository.countDistinctByUser_EmailLikeIgnoreCase(email) / 10 + 1);
+    }
+
     public List<ListEntry> getEntriesByUser(String email, Optional<Integer> page) {
         UUID userId = userService.getUserByMail(email).getId();
         return repository.findAllByUserId(userId, PageRequest.of(page.orElse(0), 10));

@@ -46,6 +46,14 @@ public class ListEntryController {
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
+    @GetMapping("/page")
+    @Operation(summary = "Show all entries", description = "Show all entries with their owner")
+    @PreAuthorize("hasAuthority('USER_READ')")
+    public ResponseEntity<Integer> getAllPages() {
+        Integer pageCount =  entryService.getPages();
+        return new ResponseEntity<>(pageCount, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Show a single entry", description = "Show one entry identified by its id")
     @PreAuthorize("hasAuthority('USER_READ') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
@@ -65,6 +73,13 @@ public class ListEntryController {
         }
 
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/page")
+    @Operation(summary = "Show all entries of one user")
+    public ResponseEntity<Integer> getPagesByUser() {
+        Integer pageCount = entryService.getPagesForUser(getMailFromJWT());
+        return new ResponseEntity<>(pageCount, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
