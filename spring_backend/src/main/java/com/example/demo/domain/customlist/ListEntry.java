@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@Log4j2
 public class ListEntry extends AbstractEntity {
 
     @NotBlank
@@ -49,6 +51,11 @@ public class ListEntry extends AbstractEntity {
     @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @PostPersist
+    public void logNewEntryAdded(){
+        log.info("Created element '{}' with ID: {}", title, super.getId());
     }
 
     public enum Importance {

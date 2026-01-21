@@ -1,8 +1,8 @@
 package com.example.demo.domain.customlist;
 
-
 import com.example.demo.domain.customlist.dto.ListEntryDTO;
 import com.example.demo.domain.customlist.dto.ListEntryMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,7 @@ public class ListEntryController {
     private String getMailFromJWT(){return SecurityContextHolder.getContext().getAuthentication().getName(); }
 
     @GetMapping
+    @Operation(summary = "Show all entries", description = "Show all entries with their owner")
     @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<List<ListEntryDTO>> getAllEntries() {
         List<ListEntry> entries = entryService.getAllEntries();
@@ -41,6 +42,7 @@ public class ListEntryController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Show a single entry", description = "Show one entry identified by its id")
     @PreAuthorize("hasAuthority('USER_READ') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntryDTO> getEntryById(@PathVariable UUID id) {
         try {
@@ -52,12 +54,14 @@ public class ListEntryController {
     }
 
     @GetMapping("/user")
+    @Operation(summary = "Show all entries of one user")
     public ResponseEntity<List<ListEntryDTO>> getEntriesByUser() {
         List<ListEntry> entries = entryService.getEntriesByUser(getMailFromJWT());
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update an entry", description = "Update an entry based on its id")
     @PreAuthorize("@userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntryDTO> updateEntry(@PathVariable UUID id, @RequestBody @Valid ListEntryDTO entryDTO) {
         try {
@@ -73,6 +77,7 @@ public class ListEntryController {
     }
 
     @PostMapping
+    @Operation(summary = "Create an entry", description = "Create one entry with its attributes")
     @PreAuthorize("hasAuthority('USER_CREATE')")
     public ResponseEntity<ListEntryDTO> createEntry(@RequestBody @Valid ListEntryDTO entryDTO) {
         ListEntry saved = entryService.saveEntry(entryMapper.fromDTO(entryDTO));
@@ -80,6 +85,7 @@ public class ListEntryController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete one entry", description = "Delete an entry based on its id")
     @PreAuthorize("hasAuthority('USER_DEACTIVATE') || @userPermissionEvaluator.isOwnEntryEvaluator(authentication.principal.user,#id)")
     public ResponseEntity<ListEntry> deleteEntry(@PathVariable UUID id) {
         entryService.deleteEntryById(id);

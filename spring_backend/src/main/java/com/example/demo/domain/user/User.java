@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j2;
 
 @Entity
 @Table(name = "users")
@@ -19,6 +20,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
+@Log4j2
 public class User extends AbstractEntity {
 
   @Column(name = "first_name")
@@ -50,4 +52,8 @@ public class User extends AbstractEntity {
     this.roles = roles;
   }
 
+    @PostPersist
+    public void logNewUserAdded(){
+        log.info("Created user '{} {}' with ID: {}", firstName, lastName, super.getId());
+    }
 }
