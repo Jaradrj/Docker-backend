@@ -5,6 +5,7 @@ import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.example.demo.core.generic.AbstractServiceImpl;
 
@@ -13,7 +14,7 @@ import java.util.*;
 @Service
 public class ListEntryService extends AbstractServiceImpl<ListEntry> {
 
-    private final  UserService userService;
+    private final UserService userService;
     private final ListEntryRepository repository;
 
     public ListEntryService(UserService userService, ListEntryRepository repository) {
@@ -22,8 +23,8 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         this.userService = userService;
     }
 
-    public List<ListEntry> getAllEntries(Optional<Integer> page) {
-        return repository.findAll(PageRequest.of(page.orElse(0), 10)).getContent();
+    public List<ListEntry> getAllEntries(Optional<Integer> page, String importance, String sortBy, Boolean isAscending, UUID userId) {
+        return queryEntries(Optional.ofNullable(userId), page, importance, sortBy, isAscending);
     }
 
     public ListEntry getEntryById(UUID id) throws NoSuchListEntryException {
@@ -38,9 +39,52 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         return Math.toIntExact(repository.countDistinctByUser_EmailLikeIgnoreCase(email) / 10 + 1);
     }
 
-    public List<ListEntry> getEntriesByUser(String email, Optional<Integer> page) {
+    public List<ListEntry> getEntriesByUser(String email, Optional<Integer> page, String importance, String sortBy, Boolean isAscending) {
         UUID userId = userService.getUserByMail(email).getId();
-        return repository.findAllByUserId(userId, PageRequest.of(page.orElse(0), 10));
+        return queryEntries(Optional.of(userId), page, importance, sortBy, isAscending);
+    }
+
+    private List<ListEntry> queryEntries(Optional<UUID> userId,
+                                         Optional<Integer> page,
+                                         String importance,
+                                         String sortBy,
+                                         Boolean isAscending) {
+        String property = (sortBy == null || sortBy.isBlank()) ? "createdAt" : sortBy;
+        if ("user".equalsIgnoreCase(property)) {
+            property = "user.lastName";
+        }
+
+        if ("importance".equalsIgnoreCase(property)) {
+            if (userId.isPresent()) {
+                List<ListEntry> data = repository.findAllByUserId(userId.get(), ListEntry.Importance.valueOf(importance), Sort.unsorted());
+                Map<ListEntry.Importance, Integer> rank = new HashMap<>();
+                rank.put(ListEntry.Importance.LOW, 0);
+                rank.put(ListEntry.Importance.MEDIUM, 1);
+                rank.put(ListEntry.Importance.HIGH, 2);
+                Comparator<ListEntry> cmp = Comparator.comparing(e -> rank.getOrDefault(e.getImportance(), 0));
+                if (isAscending == null || !isAscending) {
+                    cmp = cmp.reversed();
+                }
+                data.sort(cmp);
+                return data;
+            } else {
+                List<ListEntry> data = repository.findAllByImportance(ListEntry.Importance.valueOf(importance), Sort.unsorted());
+                Map<ListEntry.Importance, Integer> rank = new HashMap<>();
+                rank.put(ListEntry.Importance.LOW, 0);
+                rank.put(ListEntry.Importance.MEDIUM, 1);
+                rank.put(ListEntry.Importance.HIGH, 2);
+                Comparator<ListEntry> cmp = Comparator.comparing(e -> rank.getOrDefault(e.getImportance(), 0));
+                if (isAscending == null || !isAscending) {
+                    cmp = cmp.reversed();
+                }
+                data.sort(cmp);
+                return data;
+            }
+        }
+
+        Sort sort = (isAscending != null && isAscending) ? Sort.by(property).ascending() : Sort.by(property).descending();
+        PageRequest pageable = PageRequest.of(page.orElse(0), 10, sort);
+        return userId.map(uuid -> repository.findAllByUserIdPageable(uuid, importance, pageable).getContent()).orElseGet(() -> repository.findAllPageable(importance, pageable).getContent());
     }
 
     @Transactional
