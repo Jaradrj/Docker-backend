@@ -83,10 +83,7 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
 
         Sort sort = (isAscending != null && isAscending) ? Sort.by(property).ascending() : Sort.by(property).descending();
         PageRequest pageable = PageRequest.of(page.orElse(0), 10, sort);
-        if (userId.isPresent()) {
-            return repository.findAllByUserIdPageable(userId.get(), importance, pageable).getContent();
-        }
-        return repository.findAllPageable(importance, pageable).getContent();
+        return userId.map(uuid -> repository.findAllByUserIdPageable(uuid, importance, pageable).getContent()).orElseGet(() -> repository.findAllPageable(importance, pageable).getContent());
     }
 
     @Transactional
