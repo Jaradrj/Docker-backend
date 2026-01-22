@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,12 @@ public interface ListEntryRepository extends AbstractRepository<ListEntry> {
     );
 
     Page<ListEntry> findAllByImportance(ListEntry.Importance importance, Pageable pageable);
+
+    @Query("select l from ListEntry l where (:userId is null or l.user.id = :userId) and (:importance is null or l.importance = :importance) order by case l.importance when 'LOW' then 0 when 'MEDIUM' then 1 when 'HIGH' then 2 end asc, l.createdAt desc")
+    Page<ListEntry> findAllOrderByImportanceAsc(@Param("userId") UUID userId, @Param("importance") ListEntry.Importance importance, Pageable pageable);
+
+    @Query("select l from ListEntry l where (:userId is null or l.user.id = :userId) and (:importance is null or l.importance = :importance) order by case l.importance when 'LOW' then 0 when 'MEDIUM' then 1 when 'HIGH' then 2 end desc, l.createdAt desc")
+    Page<ListEntry> findAllOrderByImportanceDesc(@Param("userId") UUID userId, @Param("importance") ListEntry.Importance importance, Pageable pageable);
 
     default Page<ListEntry> findAllByUserIdPageable(
             UUID userId,
