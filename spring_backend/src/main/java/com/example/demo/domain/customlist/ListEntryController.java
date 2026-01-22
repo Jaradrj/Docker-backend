@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,12 +65,14 @@ public class ListEntryController {
 
     @GetMapping("/user")
     @Operation(summary = "Show all entries of one user")
-    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser(@RequestParam(value = "page", required = false) Integer page) {
+    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "importance", required = false) String importance,
+                                                               @RequestParam(value = "sortBy", required = false) String sortBy,
+                                                               @RequestParam(value = "isAscending", required = false) Boolean isAscending) {
         List<ListEntry> entries;
         if (page == null) {
-            entries = entryService.getEntriesByUser(getMailFromJWT(), Optional.empty());
+            entries = entryService.getEntriesByUser(getMailFromJWT(), Optional.empty(), importance, sortBy, isAscending);
         } else {
-            entries = entryService.getEntriesByUser(getMailFromJWT(), Optional.of(page));
+            entries = entryService.getEntriesByUser(getMailFromJWT(), Optional.of(page), importance, sortBy, isAscending);
         }
 
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
