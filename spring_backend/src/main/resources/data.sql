@@ -63,7 +63,7 @@ VALUES
     (gen_random_uuid(), 'Basement Cleanup', 'Scrub the floors after the Tuesday night session.', 'MEDIUM', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
     (gen_random_uuid(), 'Soap Packaging', 'Wrap the new shipment of luxury bars for the department store.', 'LOW', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
     (gen_random_uuid(), 'Recruitment Flyers', 'Print and distribute the "Are You Alive?" pamphlets.', 'HIGH', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
-    (gen_random_uuid(), 'Night Patrol', 'Walk the perimeter of the Paper St. property.', 'MEDIUM', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
+    ('2d21d79c-2bb7-4722-8e98-9c802b3958e1', 'Night Patrol', 'Walk the perimeter of the Paper St. property.', 'MEDIUM', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
     (gen_random_uuid(), 'Discard Belongings', 'Identify three more items in the house to throw away.', 'LOW', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
     (gen_random_uuid(), 'Fight Night Logistics', 'Ensure enough water and medical tape for the members.', 'HIGH', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
     (gen_random_uuid(), 'Propaganda Printing', 'Start the mimeograph for the Phase 2 instructions.', 'HIGH', '0d8fa44c-54fd-4cd0-ace9-2a7da57992de', now()),
@@ -82,6 +82,6 @@ VALUES
     (gen_random_uuid(), 'Gym Membership', 'Renew the annual plan before the price increase.', 'LOW', '31774049-72ca-4345-8dce-e27955485f52', now()),
     (gen_random_uuid(), 'Tech Blog Post', 'Write 500 words about Spring Security best practices.', 'MEDIUM', '31774049-72ca-4345-8dce-e27955485f52', now()),
     (gen_random_uuid(), 'Database Migration', 'Run the Liquibase scripts on the production replica.', 'HIGH', '31774049-72ca-4345-8dce-e27955485f52', now()),
-    (gen_random_uuid(), 'Coffee Bean Refill', 'Order two bags of Ethiopian light roast.', 'LOW', '31774049-72ca-4345-8dce-e27955485f52', now()),
+    ('fbfb502e-2989-441c-8374-c359905cad3f', 'Coffee Bean Refill', 'Order two bags of Ethiopian light roast.', 'LOW', '31774049-72ca-4345-8dce-e27955485f52', now()),
     (gen_random_uuid(), 'Weekend Hiking', 'Pack the gear for the trip to the Blue Ridge Mountains.', 'MEDIUM', '31774049-72ca-4345-8dce-e27955485f52', now())
     ON CONFLICT DO NOTHING;
