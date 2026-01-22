@@ -5,6 +5,7 @@ import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.example.demo.core.generic.AbstractServiceImpl;
@@ -55,30 +56,19 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         }
 
         if ("importance".equalsIgnoreCase(property)) {
-            if (userId.isPresent()) {
-                List<ListEntry> data = repository.findAllByUserId(userId.get(), ListEntry.Importance.valueOf(importance), Sort.unsorted());
-                Map<ListEntry.Importance, Integer> rank = new HashMap<>();
-                rank.put(ListEntry.Importance.LOW, 0);
-                rank.put(ListEntry.Importance.MEDIUM, 1);
-                rank.put(ListEntry.Importance.HIGH, 2);
-                Comparator<ListEntry> cmp = Comparator.comparing(e -> rank.getOrDefault(e.getImportance(), 0));
-                if (isAscending == null || !isAscending) {
-                    cmp = cmp.reversed();
+            ListEntry.Importance importanceEnum = null;
+            try {
+                if (importance != null && !importance.isBlank()) {
+                    importanceEnum = ListEntry.Importance.valueOf(importance.trim().toUpperCase());
                 }
-                data.sort(cmp);
-                return data;
+            } catch (IllegalArgumentException ignored) {}
+            Pageable pageable = PageRequest.of(page.orElse(0), 10);
+            UUID uid = userId.orElse(null);
+            boolean asc = isAscending != null && isAscending;
+            if (asc) {
+                return repository.findAllOrderByImportanceAsc(uid, importanceEnum, pageable).getContent();
             } else {
-                List<ListEntry> data = repository.findAllByImportance(ListEntry.Importance.valueOf(importance), Sort.unsorted());
-                Map<ListEntry.Importance, Integer> rank = new HashMap<>();
-                rank.put(ListEntry.Importance.LOW, 0);
-                rank.put(ListEntry.Importance.MEDIUM, 1);
-                rank.put(ListEntry.Importance.HIGH, 2);
-                Comparator<ListEntry> cmp = Comparator.comparing(e -> rank.getOrDefault(e.getImportance(), 0));
-                if (isAscending == null || !isAscending) {
-                    cmp = cmp.reversed();
-                }
-                data.sort(cmp);
-                return data;
+                return repository.findAllOrderByImportanceDesc(uid, importanceEnum, pageable).getContent();
             }
         }
 
