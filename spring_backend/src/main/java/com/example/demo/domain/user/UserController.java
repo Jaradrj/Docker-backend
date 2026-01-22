@@ -60,7 +60,7 @@ public class UserController {
     return new ResponseEntity<>(userMapper.toDTO(user), HttpStatus.CREATED);
   }
   @PutMapping("/{id}")
-  @PreAuthorize("@userPermissionEvaluator.isThemselfEvaluator(authentication.principal.user,#id)")
+  @PreAuthorize("hasAuthority('USER_MODIFY') ||@userPermissionEvaluator.isThemselfEvaluator(authentication.principal.user,#id)")
   public ResponseEntity<UserDTO> updateById(@PathVariable UUID id, @Valid @RequestBody UserDTO userDTO) {
     User user = userService.updateById(id, userMapper.fromDTO(userDTO));
     return new ResponseEntity<>(userMapper.toDTO(user), HttpStatus.OK);
