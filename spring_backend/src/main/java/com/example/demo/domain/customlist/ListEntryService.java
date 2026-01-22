@@ -1,6 +1,7 @@
 package com.example.demo.domain.customlist;
 
 import com.example.demo.core.exception.NoSuchListEntryException;
+import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
@@ -58,7 +59,9 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         repository.deleteById(id);
     }
 
-    public ListEntry saveEntry(ListEntry listEntry) {
+    public ListEntry saveEntry(ListEntry listEntry, String email) {
+        User user = userService.getUserByMail(email);
+        listEntry.setUser(user);
         return save(listEntry);
     }
 }

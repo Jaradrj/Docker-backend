@@ -1,6 +1,8 @@
 package com.example.demo.domain.customlist;
 
 import com.example.demo.core.exception.NoSuchListEntryException;
+import com.example.demo.domain.customlist.dto.CreateListEntryDTO;
+import com.example.demo.domain.customlist.dto.CreateListEntryMapper;
 import com.example.demo.domain.customlist.dto.ListEntryDTO;
 import com.example.demo.domain.customlist.dto.ListEntryMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,11 +26,13 @@ public class ListEntryController {
 
     private final ListEntryService entryService;
     private final ListEntryMapper entryMapper;
+    private final CreateListEntryMapper createListEntryMapper;
 
     @Autowired
-    public ListEntryController(ListEntryService entryService, ListEntryMapper entryMapper) {
+    public ListEntryController(ListEntryService entryService, ListEntryMapper entryMapper, CreateListEntryMapper createListEntryMapper) {
         this.entryService = entryService;
         this.entryMapper = entryMapper;
+        this.createListEntryMapper = createListEntryMapper;
     }
 
     private String getMailFromJWT(){return SecurityContextHolder.getContext().getAuthentication().getName(); }
@@ -95,8 +99,8 @@ public class ListEntryController {
     @PostMapping
     @Operation(summary = "Create an entry", description = "Create one entry with its attributes")
     @PreAuthorize("hasAuthority('USER_CREATE')")
-    public ResponseEntity<ListEntryDTO> createEntry(@RequestBody @Valid ListEntryDTO entryDTO) {
-        ListEntry saved = entryService.saveEntry(entryMapper.fromDTO(entryDTO));
+    public ResponseEntity<ListEntryDTO> createEntry(@RequestBody @Valid CreateListEntryDTO entryDTO) {
+        ListEntry saved = entryService.saveEntry(createListEntryMapper.fromDTO(entryDTO), getMailFromJWT());
         return new ResponseEntity<>(entryMapper.toDTO(saved), HttpStatus.CREATED);
     }
 
