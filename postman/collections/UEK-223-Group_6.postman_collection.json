@@ -1,10 +1,11 @@
 {
   "info": {
-    "_postman_id": "f9d72fff-7c04-409c-b32b-74df1b7476b5",
+    "_postman_id": "6494b7a9-41b4-4856-915e-a49f8717525b",
     "name": "UEK-223-Group_6",
     "description": "Auto-discovered API endpoints from Spring Boot backend (UEK-223-Group-6-Backend). This collection contains all HTTP routes found in the UserController.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "43313456"
+    "_exporter_id": "43313961",
+    "_collection_link": "https://go.postman.co/collection/43313961-6494b7a9-41b4-4856-915e-a49f8717525b?source=collection_link"
   },
   "item": [
     {
@@ -531,6 +532,17 @@
                 "packages": {},
                 "requests": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
             }
           ],
           "request": {
@@ -552,13 +564,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/list-entries/{{IdToUpdate}}",
+              "raw": "{{baseUrl}}/list-entries/{{listEntryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "list-entries",
-                "{{IdToUpdate}}"
+                "{{listEntryId}}"
               ]
             }
           },
@@ -988,7 +1000,7 @@
           "response": []
         },
         {
-          "name": "[N] Update other User (all users)",
+          "name": "[N] Update other User (users)",
           "event": [
             {
               "listen": "test",
@@ -1028,6 +1040,60 @@
               "path": [
                 "user",
                 "{{foreignIdToUpdate}}"
+              ]
+            },
+            "description": "Update an existing user by their UUID. Requires authentication and USER_MODIFY authority. Users can only modify their own profile."
+          },
+          "response": []
+        },
+        {
+          "name": "Update other User (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Admin can update others\", () => {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "    pm.response.to.have.jsonBody({\r",
+                  "        \"id\": pm.expect.string,\r",
+                  "        \"firstName\": pm.expect.string,\r",
+                  "        \"lastName\": pm.expect.string,\r",
+                  "        \"email\": pm.expect.string,\r",
+                  "        \"roles\": pm.expect.array\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AdminAccessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"Noob\",\n    \"lastName\": \"Noob\",\n    \"email\": \"new@example.com\",\n    \"roles\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/{{createdUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "{{createdUserId}}"
               ]
             },
             "description": "Update an existing user by their UUID. Requires authentication and USER_MODIFY authority. Users can only modify their own profile."
