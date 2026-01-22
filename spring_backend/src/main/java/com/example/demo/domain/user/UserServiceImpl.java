@@ -65,17 +65,4 @@ public class UserServiceImpl extends AbstractServiceImpl<User> implements UserSe
       updatingUser.setLastName(newUser.getLastName());
       return repository.save(updatingUser);
     }
-
-    @Override
-    public boolean isUserAdmin(User user) {
-        boolean isAdmin = false;
-        for (Role role : user.getRoles()){
-            if(Objects.equals(role.getName(), "ADMIN")) {
-                isAdmin = true;
-                break;
-            }
-        }
-        return isAdmin;
-    }
-
 }

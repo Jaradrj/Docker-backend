@@ -12,7 +12,5 @@ public interface UserService extends UserDetailsService, AbstractService<User> {
 
   User getUserByMail(String email);
 
-  boolean isUserAdmin(User user);
-
   User updateUserById(UUID id, User newUser);
 }
