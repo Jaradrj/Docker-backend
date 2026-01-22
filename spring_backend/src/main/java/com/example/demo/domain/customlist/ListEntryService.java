@@ -2,6 +2,7 @@ package com.example.demo.domain.customlist;
 
 import com.example.demo.domain.user.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.example.demo.core.generic.AbstractServiceImpl;
 
@@ -27,9 +28,33 @@ public class ListEntryService extends AbstractServiceImpl<ListEntry> {
         return repository.findById(id).orElseThrow(Exception::new);
     }
 
-    public List<ListEntry> getEntriesByUser(String email) {
+    public List<ListEntry> getEntriesByUser(String email, String importance, String sortBy, Boolean isAscending) {
         UUID userId = userService.getUserByMail(email).getId();
-        return repository.findAllByUserId(userId);
+
+        String property = (sortBy == null || sortBy.isBlank()) ? "createdAt" : sortBy;
+        if ("user".equalsIgnoreCase(property)) {
+            property = "user.lastName";
+        }
+
+        if ("importance".equalsIgnoreCase(property)) {
+            List<ListEntry> data = repository.findAllByUserId(userId, importance, Sort.unsorted());
+
+            Map<ListEntry.Importance, Integer> rank = new HashMap<>();
+            rank.put(ListEntry.Importance.LOW, 0);
+            rank.put(ListEntry.Importance.MEDIUM, 1);
+            rank.put(ListEntry.Importance.HIGH, 2);
+
+            Comparator<ListEntry> cmp = Comparator.comparing(e -> rank.getOrDefault(e.getImportance(), 0));
+
+            if (isAscending == null || !isAscending) {
+                cmp = cmp.reversed();
+            }
+
+            data.sort(cmp);
+            return data;
+        }
+        Sort sort = (isAscending != null && isAscending) ? Sort.by(property).ascending() : Sort.by(property).descending();
+        return repository.findAllByUserId(userId, importance, sort);
     }
 
     @Transactional

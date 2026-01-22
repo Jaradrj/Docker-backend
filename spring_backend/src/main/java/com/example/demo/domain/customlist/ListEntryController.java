@@ -52,8 +52,11 @@ public class ListEntryController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser() {
-        List<ListEntry> entries = entryService.getEntriesByUser(getMailFromJWT());
+    public ResponseEntity<List<ListEntryDTO>> getEntriesByUser(
+            @RequestParam(value = "importance", required = false) String importance,
+            @RequestParam(value = "sortBy", required = false) String sortBy,
+            @RequestParam(value = "isAscending", required = false) Boolean isAscending) {
+        List<ListEntry> entries = entryService.getEntriesByUser(getMailFromJWT(), importance, sortBy, isAscending);
         return new ResponseEntity<>(entryMapper.toDTOs(entries), HttpStatus.OK);
     }
 
