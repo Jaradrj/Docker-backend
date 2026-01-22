@@ -9,14 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface ListEntryRepository extends AbstractRepository<ListEntry> {
-
-    List<ListEntry> findAllByUserId(UUID userId, ListEntry.Importance importance, Sort sort);
-    List<ListEntry> findAllByImportance(ListEntry.Importance importance, Sort sort);
 
     Page<ListEntry> findAllByUserIdAndImportance(
             UUID userId,
