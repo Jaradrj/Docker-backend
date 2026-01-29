@@ -28,6 +28,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Backend Tests
+        working-directory: ./spring_backend
         run: |
           chmod +x ./gradlew
           ./gradlew test
