@@ -1,5 +1,7 @@
 package com.example.demo;
 
+
+
 import org.junit.jupiter.api.Test;
 
 class DemoApplicationTests {
@@ -8,4 +10,8 @@ class DemoApplicationTests {
 	void contextLoads() {
 	}
 
+	@Test
+	void dummyTest() {
+		assert(true);
+	}
 }
