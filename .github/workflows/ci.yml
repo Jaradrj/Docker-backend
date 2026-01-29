@@ -29,6 +29,7 @@ jobs:
 
       - name: Run Backend Tests
         run: |
+          chmod +x ./docker-backend/gradlew
           ./gradlew test
 
       - name: Build & Push Backend Image
