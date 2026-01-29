@@ -71,7 +71,7 @@ jobs:
       - name: Backend healthcheck
         run: |
             for i in {1..10}; do
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://jara.dev.noseryoung.ch:8915/actuator/health || true)
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://jara.dev.noseryoung.ch/actuator/health || true)
               echo "Attempt $i: status = $STATUS"
               if [ "$STATUS" -eq 200 ]; then
                 exit 0
