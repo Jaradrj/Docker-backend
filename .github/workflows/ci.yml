@@ -28,10 +28,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Backend Tests
-        working-directory: ./spring_backend
+        working-directory: ./docker-backend
         run: |
           ./gradlew test
-          
+
       - name: Build & Push Backend Image
         uses: docker/build-push-action@v5
         with:
