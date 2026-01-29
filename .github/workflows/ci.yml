@@ -13,11 +13,6 @@ jobs:
       contents: read
       packages: write
 
-    env:
-      SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
-      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,7 +35,20 @@ jobs:
           tags: |
             ghcr.io/jaradrj/backend:latest
             ghcr.io/jaradrj/backend:${{ github.sha }}
-          build-args: |
-            SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}
-            SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}
-            SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+
+  deploy:
+    needs: build-and-push-backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Backend to Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: hosting.dev.noseryoung.ch
+          username: jara
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          port: 2222
+          script: |
+            cd /home/jara
+            docker compose pull backend
+            docker compose up -d backend
