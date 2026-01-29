@@ -42,6 +42,7 @@ public class WebSecurityConfig {
     return http.authorizeHttpRequests(
         requests -> requests.requestMatchers(HttpMethod.POST, "/user/login", "/user/register").permitAll()
                             .requestMatchers(HttpMethod.GET, "/v3/api-docs","/v3/api-docs/swagger-config","/swagger-ui/*").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                             .anyRequest().authenticated())
             .addFilterAfter(new JWTAuthenticationFilter(new AntPathRequestMatcher("/user/login", "POST"),
                     authenticationManager(), jwtProperties), UsernamePasswordAuthenticationFilter.class)
