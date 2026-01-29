@@ -28,7 +28,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Backend Tests
-        working-directory: ./docker-backend
         run: |
           ./gradlew test
 
